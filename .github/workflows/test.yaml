@@ -22,3 +22,7 @@ jobs:
 
       - name: Test webpages
         run: python3 tests/test_basic.py
+        
+      
+      - name: Test registration inputs
+        run: python3 tests/test_users.py
