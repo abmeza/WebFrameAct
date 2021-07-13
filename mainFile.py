@@ -40,5 +40,11 @@ def register():
         return redirect(url_for('home')) # if so - send to home page
     return render_template('register.html', title='Register', form=form)
   
+@app.route("/captions")
+def captions():
+    TITLE = "Weird, or just different? | Derek Sivers"
+    FILE_NAME = "Weird_Derek_Sivers.wav"
+    return render_template('captions.html', songName=TITLE, file=FILE_NAME)
+
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
