@@ -2,6 +2,9 @@ from flask import Flask, render_template, url_for, flash, redirect
 from forms import RegistrationForm
 import secrets
 from flask_sqlalchemy import SQLAlchemy
+from audioCode import printWAV
+import time, random, threading
+from turbo_flask import Turbo
 
 #print(secrets.token_hex(16))
 app = Flask(__name__)
