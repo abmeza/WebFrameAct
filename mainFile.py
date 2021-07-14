@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, flash, redirect
-from forms import RegistrationForm
+from forms import RegistrationForm, LoginForm
 import secrets
 from flask_sqlalchemy import SQLAlchemy
 from audioCode import printWAV
@@ -26,7 +26,7 @@ class User(db.Model):
   password = db.Column(db.String(60), nullable=False)
 
   def __repr__(self):
-    return f"User('{self.username}', '{self.email}')"
+    return f"User('{self.username}', '{self.email}', '{self.password}')"
 
 
 @app.route("/")
@@ -36,22 +36,9 @@ def home():
 
 # TESTING FUN
 # Allows us to use variable inputs
-@app.route("/<name>")
-def hello(name):
-    return f"Hello, {escape(name)}!"
-
-
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    if form.validate_on_submit(): # checks if entries are valid
-        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash(f'Account created for {form.username.data}!', 'success')
-        return redirect(url_for('home')) # if so - send to home page
-    return render_template('register.html', title='Register', form=form)
-
+# @app.route("/<name>")
+# def hello(name):
+#    return f"Hello, {escape(name)}!"
 
 @app.route("/second_page")
 def second_page():
@@ -70,13 +57,35 @@ def register():
         user = User(username=form.username.data, email=form.email.data, password=form.password.data)
         db.session.add(user)
         db.session.commit()
+        
         flash(f'Account created for {form.username.data}!', 'success')
-        ############## Test print
-        print(url_for('home'))
-        #############        
         return redirect(url_for('home')) # if so - send to home page
     return render_template('register.html', title='Register', form=form)
-  
+
+    
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit(): # checks if entries are valid
+        login_user = User.query.filter_by(username=form.username.data).first()
+        
+        # Username does not exist
+        if login_user is None:
+            flash(f'Username {form.username.data} does not exist!', 'failure')
+            return render_template('login.html', title='Login', form=form)
+        
+        #Incorrect Password
+        if login_user.password != form.password.data:
+            flash(f'Incorrect password ', 'failure')
+            return render_template('login.html', title='Login', form=form)
+        
+        # Successful Login
+        flash(f'{form.username.data} successfully logged in!', 'success')
+        return redirect(url_for('home')) # if so - send to home page
+        
+    return render_template('login.html', title='Login', form=form)
+
+    
 @app.route("/captions")
 def captions():
     TITLE = "Weird, or just different? | Derek Sivers"
