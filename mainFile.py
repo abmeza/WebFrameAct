@@ -62,6 +62,7 @@ def before_first_request():
     #starting thread that will time updates
     threading.Thread(target=update_captions, daemon=True).start()
 
+
 @app.context_processor
 def inject_load():
     # getting previous time stamp
