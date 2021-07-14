@@ -85,6 +85,10 @@ def update_captions():
 
             # forcefully updating captionsPane with caption
             turbo.push(turbo.replace(render_template('captionsPane.html'), 'load'))
+            
+            
+            #Error message found, what is captionsPane though !?????????
+  
   
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
