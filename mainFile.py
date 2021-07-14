@@ -5,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from audioCode import printWAV
 import time, random, threading
 from turbo_flask import Turbo
+from markupsafe import escape
+
 
 #print(secrets.token_hex(16))
 app = Flask(__name__)
@@ -32,10 +34,13 @@ class User(db.Model):
 def home():
     return render_template('home.html', subtitle='Home Page', text='This is the home page')
 
-@app.route("/second_page")
-def second_page():
-    return render_template('second_page.html', subtitle='Second Page', text='This is the second page')
-  
+# TESTING FUN
+# Allows us to use variable inputs
+@app.route("/<name>")
+def hello(name):
+    return f"Hello, {escape(name)}!"
+
+
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -44,6 +49,31 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash(f'Account created for {form.username.data}!', 'success')
+        return redirect(url_for('home')) # if so - send to home page
+    return render_template('register.html', title='Register', form=form)
+
+
+@app.route("/second_page")
+def second_page():
+    return render_template('second_page.html', subtitle='Second Page', text='This is the second page')
+
+
+@app.route("/about")
+def about():
+    return render_template('about.html', subtitle='About Page', text='This is the about page with more information')
+
+    
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit(): # checks if entries are valid
+        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash(f'Account created for {form.username.data}!', 'success')
+        ############## Test print
+        print(url_for('home'))
+        #############        
         return redirect(url_for('home')) # if so - send to home page
     return render_template('register.html', title='Register', form=form)
   
