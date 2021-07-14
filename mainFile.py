@@ -13,6 +13,10 @@ app.config['SECRET_KEY'] = 'ddceab38b9f340c6971645af5b9ab8e6'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
+interval=10
+FILE_NAME = "Weird_Derek_Sivers.wav"
+turbo = Turbo(app)
+
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   username = db.Column(db.String(20), unique=True, nullable=False)
@@ -46,7 +50,6 @@ def register():
 @app.route("/captions")
 def captions():
     TITLE = "Weird, or just different? | Derek Sivers"
-    FILE_NAME = "Weird_Derek_Sivers.wav"
     return render_template('captions.html', songName=TITLE, file=FILE_NAME)
 
 if __name__ == '__main__':
