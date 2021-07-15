@@ -8,17 +8,24 @@ from turbo_flask import Turbo
 from markupsafe import escape
 
 
-#print(secrets.token_hex(16))
+# Set up SQLAchemy to use databases with db
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'ddceab38b9f340c6971645af5b9ab8e6'
-
+# print(secrets.token_hex(16))
+app.config['SECRET_KEY'] = 'ddceab38b9f340c6971645af5b9ab8e6' 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
+
+# Establish general variables for audio
 interval=10
 FILE_NAME = "Weird_Derek_Sivers.wav"
+
+# Create turbo app instance
 turbo = Turbo(app)
 
+
+# Class that models a user and their paramaters
+# Used for handling database information
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   username = db.Column(db.String(20), unique=True, nullable=False)
@@ -34,11 +41,6 @@ class User(db.Model):
 def home():
     return render_template('home.html', subtitle='Home Page', text='This is the home page')
 
-# TESTING FUN
-# Allows us to use variable inputs
-# @app.route("/<name>")
-# def hello(name):
-#    return f"Hello, {escape(name)}!"
 
 @app.route("/second_page")
 def second_page():
@@ -90,6 +92,15 @@ def login():
 def captions():
     TITLE = "Weird, or just different? | Derek Sivers"
     return render_template('captions.html', songName=TITLE, file=FILE_NAME)
+
+
+
+# TESTING FUN
+# Allows us to use variable inputs
+# @app.route("/<name>")
+# def hello(name):
+#    return f"Hello, {escape(name)}!"
+
 
 @app.before_first_request
 def before_first_request():

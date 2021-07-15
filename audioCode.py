@@ -1,6 +1,8 @@
 import speech_recognition as sr
 from os import path
-                
+
+
+# Prints the what speach is processed from the audio
 def printWAV(FILE_NAME, pos, clip):
     # use the audio file as the audio source
     AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), 'static/'+FILE_NAME)
