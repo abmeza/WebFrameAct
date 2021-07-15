@@ -7,6 +7,7 @@ from audioCode import printWAV
 import time, random, threading
 from turbo_flask import Turbo
 from markupsafe import escape
+from flask_bcrypt import Bcrypt
 
 
 # Set up app for 
@@ -17,6 +18,9 @@ app.config['SECRET_KEY'] = 'ddceab38b9f340c6971645af5b9ab8e6'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
+# Set up bcrypt for password hashing
+bcrypt = Bcrypt()
+
 
 # Establish general variables for audio
 interval=10
@@ -25,6 +29,23 @@ FILE_NAME = "Weird_Derek_Sivers.wav"
 # Create turbo app instance
 turbo = Turbo(app)
 
+###
+# Helper functions
+###
+
+# Give a password to encrpyt by salting and hashing
+def encrypt_password(password):
+    return bcrypt.generate_password_hash(password)
+       
+
+# Check if encrypted pasword and guess input password match, thus valid
+def check_password_match(pw_hash, guess):
+    return bcrypt.check_password_hash(pw_hash, guess) 
+
+
+###
+# Classses
+###
 
 # Class that models a user and their paramaters
 # Used for handling database information
@@ -37,8 +58,9 @@ class User(db.Model):
   def __repr__(self):
     return f"User('{self.username}', '{self.email}', '{self.password}')"
 
-
-
+###
+# Main Functions
+###
 @app.route("/")
 @app.route("/intro")
 def intro():
@@ -82,7 +104,7 @@ def login():
             return render_template('login.html', title='Login', form=form)
         
         #Incorrect Password
-        if login_user.password != form.password.data:
+        if not check_password_match(login_user.password, form.password.data):
             flash(f'Incorrect password ', 'danger')
             return render_template('login.html', title='Login', form=form)
         
@@ -127,7 +149,9 @@ def register():
             return render_template('register.html', title='Register', form=form)
         
         # User can be registered
-        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        user = User(username=form.username.data, 
+                    email=form.email.data, 
+                    password= encrypt_password(form.password.data))
         db.session.add(user)
         db.session.commit()
         
