@@ -8,8 +8,8 @@ from turbo_flask import Turbo
 from markupsafe import escape
 
 
-# Set up SQLAchemy to use databases with db
-app = Flask(__name__)
+# Set up app for 
+app = Flask(__name__)  # Give flask name of file
 # print(secrets.token_hex(16))
 app.config['SECRET_KEY'] = 'ddceab38b9f340c6971645af5b9ab8e6' 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -36,10 +36,66 @@ class User(db.Model):
     return f"User('{self.username}', '{self.email}', '{self.password}')"
 
 
+
 @app.route("/")
+@app.route("/intro")
+def intro():
+    subtitle = [
+        'Welcome to the website',
+        'Navigation Info',
+        'My Favorite Color',
+        'My Least Favorite'
+    ]
+    text = [
+        'This is some text to introduce you to our website. Hopefullt you' +
+        'Understand it and feel now very well introduced',
+        
+        'This is navigation information. You will be able to access tabs' +
+        'to go to all the random pages that are yet to be created' +
+        '. Login first to see them all though. Or else it is a no go',
+        
+        'I don\'t have one. I should but oh well it is whatever.',
+        
+        'Here are extra llines to test the line break',
+        
+        'Did they work?',
+        
+        'Will now test some preformatted text \n and see\n\n how it looks'
+    ]
+    return render_template('intro.html', 
+                           title='Introduction Page', 
+                           subtitle=subtitle,
+                           text=text)
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit(): # checks if entries are valid
+        login_user = User.query.filter_by(username=form.username.data).first()
+        
+        # Username does not exist
+        if login_user is None:
+            flash(f'Username {form.username.data} does not exist!', 'failure')
+            return render_template('login.html', title='Login', form=form)
+        
+        #Incorrect Password
+        if login_user.password != form.password.data:
+            flash(f'Incorrect password ', 'failure')
+            return render_template('login.html', title='Login', form=form)
+        
+        # Successful Login
+        flash(f'{form.username.data} successfully logged in!', 'success')
+        return redirect(url_for('home')) # if so - send to home page
+        
+    return render_template('login.html', title='Login', form=form)
+
+
+
 @app.route("/home")
 def home():
-    return render_template('home.html', subtitle='Home Page', text='This is the home page')
+    
+    return render_template('home.html', title='Home Page', subtitle='Hub for the website')
 
 
 @app.route("/second_page")
@@ -63,29 +119,6 @@ def register():
         flash(f'Account created for {form.username.data}!', 'success')
         return redirect(url_for('home')) # if so - send to home page
     return render_template('register.html', title='Register', form=form)
-
-    
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit(): # checks if entries are valid
-        login_user = User.query.filter_by(username=form.username.data).first()
-        
-        # Username does not exist
-        if login_user is None:
-            flash(f'Username {form.username.data} does not exist!', 'failure')
-            return render_template('login.html', title='Login', form=form)
-        
-        #Incorrect Password
-        if login_user.password != form.password.data:
-            flash(f'Incorrect password ', 'failure')
-            return render_template('login.html', title='Login', form=form)
-        
-        # Successful Login
-        flash(f'{form.username.data} successfully logged in!', 'success')
-        return redirect(url_for('home')) # if so - send to home page
-        
-    return render_template('login.html', title='Login', form=form)
 
     
 @app.route("/captions")
@@ -142,3 +175,17 @@ def update_captions():
   
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
+    
+    
+########################
+# Handy Resource Links #
+########################
+
+# Colors:
+# https://www.colorschemer.com/hex-color-codes/
+#
+# Flask documentiation:
+# https://flask.palletsprojects.com/en/2.0.x/
+#
+# Basic jinja documentation:
+# https://jinja.palletsprojects.com/en/3.0.x/templates/
