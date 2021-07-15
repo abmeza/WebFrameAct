@@ -1,4 +1,11 @@
 {% extends "layout.html" %}
+
+{% block navigation_bar %}
+    {{ super() }}
+    <a class="nav-item nav-link" href="/register">Register</a>
+
+{% endblock %}
+
 {% block content %}
     <div class="content-section">
         <form method="POST" action="">

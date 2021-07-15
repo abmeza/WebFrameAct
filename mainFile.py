@@ -1,4 +1,5 @@
 from flask import Flask, render_template, url_for, flash, redirect
+from flask_behind_proxy import FlaskBehindProxy
 from forms import RegistrationForm, LoginForm
 import secrets
 from flask_sqlalchemy import SQLAlchemy
@@ -10,6 +11,7 @@ from markupsafe import escape
 
 # Set up app for 
 app = Flask(__name__)  # Give flask name of file
+#proxied = FlaskBehindProxy(app)
 # print(secrets.token_hex(16))
 app.config['SECRET_KEY'] = 'ddceab38b9f340c6971645af5b9ab8e6' 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -76,12 +78,12 @@ def login():
         
         # Username does not exist
         if login_user is None:
-            flash(f'Username {form.username.data} does not exist!', 'failure')
+            flash(f'Username {form.username.data} does not exist!', 'danger')
             return render_template('login.html', title='Login', form=form)
         
         #Incorrect Password
         if login_user.password != form.password.data:
-            flash(f'Incorrect password ', 'failure')
+            flash(f'Incorrect password ', 'danger')
             return render_template('login.html', title='Login', form=form)
         
         # Successful Login
@@ -94,7 +96,6 @@ def login():
 
 @app.route("/home")
 def home():
-    
     return render_template('home.html', title='Home Page', subtitle='Hub for the website')
 
 
@@ -112,12 +113,26 @@ def about():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit(): # checks if entries are valid
+        
+        # Check database if username is already in use
+        exist_user = User.query.filter_by(username=form.username.data).first()
+        if exist_user is not None:
+            flash(f'Username {exist_user.username} is already taken', 'danger')
+            return render_template('register.html', title='Register', form=form)
+        
+        # Check database if email is already in use
+        exist_user = User.query.filter_by(email=form.email.data).first()
+        if exist_user is not None:
+            flash(f'Email {exist_user.email} is already taken', 'danger')
+            return render_template('register.html', title='Register', form=form)
+        
+        # User can be registered
         user = User(username=form.username.data, email=form.email.data, password=form.password.data)
         db.session.add(user)
         db.session.commit()
         
         flash(f'Account created for {form.username.data}!', 'success')
-        return redirect(url_for('home')) # if so - send to home page
+        return redirect(url_for('login'))   # Successfully registered now login
     return render_template('register.html', title='Register', form=form)
 
     
@@ -169,9 +184,6 @@ def update_captions():
 
             # forcefully updating captionsPane with caption
             turbo.push(turbo.replace(render_template('captionsPane.html'), 'load'))
-            
-            # Error message found, what is captionsPane though !?????????
-            # will be modifying captionsPane to captions and see what happens
   
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")

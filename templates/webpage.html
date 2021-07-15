@@ -1,4 +1,13 @@
 {% extends "layout.html" %}
+
+{% block navigation_bar %}
+    <a class="nav-item nav-link" href="/home">Home</a>
+    <a class="nav-item nav-link" href="/about">About</a>
+    <a class="nav-item nav-link" href="/captions">Captions</a>
+    <a class="nav-item nav-link" href="/second_page">Second Page</a>
+    <a class="nav-item nav-link" href="/">logout</a>
+{% endblock %}
+
 {% block content %}
     <h2>{{ subtitle }}</h2>
     <p>{{ text }}</p>
