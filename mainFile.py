@@ -8,7 +8,9 @@ import time, random, threading
 from turbo_flask import Turbo
 from markupsafe import escape
 from flask_bcrypt import Bcrypt
+from APICode import *
 
+imageurl = "aaa"
 
 # Set up app for 
 app = Flask(__name__)  # Give flask name of file
@@ -58,12 +60,14 @@ class User(db.Model):
   def __repr__(self):
     return f"User('{self.username}', '{self.email}', '{self.password}')"
 
+
 ###
 # Main Functions
 ###
 @app.route("/")
 @app.route("/intro")
 def intro():
+    print(imageurl)
     subtitle = [
         'Welcome to the website',
         'Navigation Info',
@@ -89,7 +93,8 @@ def intro():
     return render_template('intro.html', 
                            title='Introduction Page', 
                            subtitle=subtitle,
-                           text=text)
+                           text=text,
+                           image=imageurl)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -210,6 +215,27 @@ def update_captions():
             turbo.push(turbo.replace(render_template('captionsPane.html'), 'load'))
   
 if __name__ == '__main__':
+    # Authentication Information
+    CLIENT_id = "2b1a105e0bf94d69924ed5789171693f"
+    SECRET_id = "487346bb76a54e05b308947a10a96ebe"
+    access_token = get_access_token(CLIENT_id, SECRET_id)
+
+    playlist_id = '37i9dQZF1DXcBWIGoYBM5M'   # Todays top hits 50
+    playlist = get_playlist_json(playlist_id, access_token)
+
+    todayTopHitsdf = playlist_json_to_dataframe(playlist)
+
+    # User Input to manipulate database
+    user_interface_playlist_viewer(todayTopHitsdf)
+
+    
+    # Extracting statistical Info
+    print(todayTopHitsdf.head())
+    print(todayTopHitsdf["Popularity"].mean())
+    print(todayTopHitsdf["Popularity"].describe())
+    print(todayTopHitsdf[["Add Date",
+                          "Popularity"]].groupby("Add Date").mean())
+    
     app.run(debug=True, host="0.0.0.0")
     
     
