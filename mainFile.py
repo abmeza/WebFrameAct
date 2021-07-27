@@ -18,6 +18,7 @@ app = Flask(__name__)  # Give flask name of file
 # print(secrets.token_hex(16))
 app.config['SECRET_KEY'] = 'ddceab38b9f340c6971645af5b9ab8e6' 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 # Set up bcrypt for password hashing
