@@ -13,3 +13,6 @@ pytest
 pycodestyle
 flask-bcrypt==0.7.1
 spotipy==2.18.0
+pandas==1.1.5
+matplotlib==3.3.4
+
