@@ -10,7 +10,6 @@ from markupsafe import escape
 from flask_bcrypt import Bcrypt
 from APICode import *
 
-imageurl = "aaa"
 
 # Set up app for 
 app = Flask(__name__)  # Give flask name of file
@@ -68,7 +67,6 @@ class User(db.Model):
 @app.route("/")
 @app.route("/intro")
 def intro():
-    print(imageurl)
     subtitle = [
         'Welcome to the website',
         'Navigation Info',
@@ -94,8 +92,7 @@ def intro():
     return render_template('intro.html', 
                            title='Introduction Page', 
                            subtitle=subtitle,
-                           text=text,
-                           image=imageurl)
+                           text=text)
 
 
 @app.route("/login", methods=['GET', 'POST'])
