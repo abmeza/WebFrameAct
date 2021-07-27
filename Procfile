@@ -1,1 +1,1 @@
-web: gunicorn antonapplication:app
+web:gunicorn appname:app
